@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+
+option java_multiple_files = true;
+option java_generic_services = true;
+option java_package = "com.redteamobile.matrix.pb";
+option java_outer_classname = "Demo";
+option objc_class_prefix = "Demo";
+
+// Gaga service provider
+service GagaProvider {
+    rpc ListBundle (Request2ListBundle) returns (Reply2ListBundle) {}
+}
+
+// The request message to list bundle for the given merchant code under the given status and type
+message Request2ListBundle {
+    string merchant_code = 1;
+    BundleDetail.BundleStatus status = 2;
+    int32 type = 3;
+}
+
+// The response message to show bundle list
+message Reply2ListBundle {
+    bool success = 1;
+    repeated BundleDetail bundles = 2;
+}
+
+message BundleDetail {
+    int32 id = 1;
+    string type = 2;
+    BundleStatus status = 3;
+    string location = 4;
+    int32 data_volume = 5;
+    int32 daily_limit = 6;
+    int32 duration = 7;
+    int32 get_resource_method = 8;
+    Network network = 9;
+
+    message Network {
+        repeated string mcc = 1;
+        repeated string plmn = 2;
+        repeated string fplmn = 3;
+    }
+
+    enum BundleStatus {
+        ACTIVE = 0;
+        INACTIVE = 1;
+        EXPIRED = 2;
+    }
+}

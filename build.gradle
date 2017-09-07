@@ -14,6 +14,7 @@ buildscript {
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath("se.transmode.gradle:gradle-docker:1.2")
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.1'
     }
 }
 
@@ -22,6 +23,7 @@ apply plugin: "eclipse"
 apply plugin: "idea"
 apply plugin: "spring-boot"
 apply plugin: "docker"
+apply plugin: 'com.google.protobuf'
 
 jar {
     baseName = projectName
@@ -32,11 +34,54 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 repositories {
+    jcenter()
     mavenCentral()
     maven {
         url "http://repo.redtea.io:8081/nexus/content/groups/public/"
     }
 }
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/protoGen'
+        }
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.0.0'
+    }
+    plugins {
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:1.5.0"
+        }
+    }
+
+    generateProtoTasks {
+        ofSourceSet('main').each { task ->
+            task.builtins {
+                java{
+                    outputSubDir = 'protoGen'
+                }
+            }
+            task.plugins {
+                grpc {
+                    outputSubDir = 'protoGen'
+                }
+            }
+        }
+    }
+    generatedFilesBaseDir = "$projectDir/src/"
+}
+
+task cleanProtoGen{
+    doFirst{
+        delete("$projectDir/src/main/protoGen")
+    }
+}
+clean.dependsOn cleanProtoGen
 
 dependencies {
     compile("org.springframework.boot:spring-boot-devtools")
@@ -45,7 +90,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-jdbc") {
         exclude group: "org.apache.tomcat", module: "tomcat-jdbc"
     }
-    compile("com.redteamobile:mis:0.0.14")
+    compile("com.redteamobile:mis:0.0.22")
     compile("com.zaxxer:HikariCP") {
         exclude group: "com.sun", module: "tools"
     }
@@ -61,6 +106,10 @@ dependencies {
     compile("com.h2database:h2:1.4.192")
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
     testCompile("org.springframework.boot:spring-boot-starter-test")
+
+    compile('org.lognet:grpc-spring-boot-starter:2.0.5')
+    compile group: 'com.google.protobuf', name: 'protobuf-java', version: '3.4.0'
+    compile group: 'com.google.protobuf', name: 'protobuf-java-util', version: '3.4.0'
 
 }
 
