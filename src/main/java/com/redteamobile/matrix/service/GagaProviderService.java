@@ -1,8 +1,6 @@
 package com.redteamobile.matrix.service;
 
-import com.redteamobile.matrix.pb.GagaProviderGrpc;
-import com.redteamobile.matrix.pb.Reply2ListBundle;
-import com.redteamobile.matrix.pb.Request2ListBundle;
+import com.redteamobile.matrix.pb.*;
 import io.grpc.stub.StreamObserver;
 import org.lognet.springboot.grpc.GRpcService;
 
@@ -14,8 +12,11 @@ public class GagaProviderService extends GagaProviderGrpc.GagaProviderImplBase {
     @Override
     public void listBundle(Request2ListBundle request,
             StreamObserver<Reply2ListBundle> responseObserver) {
+        BundleDetail.Network network =
+                BundleDetail.Network.newBuilder().addMcc("460").addPlmn("460001").build();
+        BundleDetail bundle = BundleDetail.newBuilder().setNetwork(network).build();
         final Reply2ListBundle.Builder replyBuilder =
-                Reply2ListBundle.newBuilder().setSuccess(true);
+                Reply2ListBundle.newBuilder().setSuccess(true).addBundles(bundle);
         responseObserver.onNext(replyBuilder.build());
         responseObserver.onCompleted();
     }

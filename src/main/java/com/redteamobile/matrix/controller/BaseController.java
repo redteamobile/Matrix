@@ -1,5 +1,8 @@
 package com.redteamobile.matrix.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.redteamobile.matrix.i18n.LocaleMessageSource;
 import com.redteamobile.matrix.model.page.ResponseStruct;
 import org.slf4j.Logger;
@@ -82,6 +85,10 @@ public class BaseController {
     public <T extends ResponseStruct> T succ(T res) {
         res.setSuccess(true);
         return res;
+    }
+
+    public JsonNode succ(ObjectNode obj) {
+        return new ObjectMapper().createObjectNode().put("success", true).setAll(obj);
     }
 
     public ResponseStruct succ(Object obj) {
