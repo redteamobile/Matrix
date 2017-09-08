@@ -32,3 +32,19 @@ public class SomeYourService extends SomeGrpc.SomeImplBase {
     }
 }
 ```
+
+## 实现rpc客户端
+   1.Future 模式
+```
+ public Reply2ListBundle listBundle(String merchantCode) throws Exception {
+        final ManagedChannel channel =
+                ManagedChannelBuilder.forAddress(${YOUR_HOST}, ${YOUR_PORT}).usePlaintext(true).build();
+        final GagaProviderGrpc.GagaProviderFutureStub stub = GagaProviderGrpc.newFutureStub(channel); // Future model
+        ListenableFuture<Reply2ListBundle> reply = stub.listBundle(Request2ListBundle.newBuilder().setMerchantCode(merchantCode).build());
+
+        while (true)
+            if (reply.isDone()) {
+                return reply.get();
+            }
+    }
+```
