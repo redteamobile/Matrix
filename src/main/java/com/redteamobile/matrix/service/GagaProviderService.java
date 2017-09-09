@@ -14,7 +14,7 @@ public class GagaProviderService extends GagaProviderGrpc.GagaProviderImplBase {
             StreamObserver<Reply2ListBundle> responseObserver) {
         BundleDetail.Network network =
                 BundleDetail.Network.newBuilder().addMcc("460").addPlmn("460001").build();
-        BundleDetail bundle = BundleDetail.newBuilder().setNetwork(network).build();
+        BundleDetail bundle = BundleDetail.newBuilder().setId(1).setNetwork(network).build();
         final Reply2ListBundle.Builder replyBuilder =
                 Reply2ListBundle.newBuilder().setSuccess(true).addBundles(bundle);
         responseObserver.onNext(replyBuilder.build());
