@@ -27,24 +27,33 @@ public class GagaProviderClient {
         final ManagedChannel channel =
                 ManagedChannelBuilder.forAddress("localhost", customResource.getGrpcPort())
                         .usePlaintext(true).build();
-        final GagaProviderGrpc.GagaProviderFutureStub stub = GagaProviderGrpc.newFutureStub(channel);
-        ListenableFuture<Reply2ListBundle>
-                reply = stub.listBundle(Request2ListBundle.newBuilder().setMerchantCode(merchantCode).build());
-
-        //这种实现相当于是blocking stub
-        while (true)
-            if (reply.isDone()) {
-                return reply.get();
-            }
+        final GagaProviderGrpc.GagaProviderBlockingStub stub =
+                GagaProviderGrpc.newBlockingStub(channel);
+        //TODO check network exception
+        Reply2ListBundle reply = stub.listBundle(
+                Request2ListBundle.newBuilder().setMerchantCode(merchantCode).build());
+        return reply;
+//        final GagaProviderGrpc.GagaProviderFutureStub stub = GagaProviderGrpc.newFutureStub(channel);
+//        ListenableFuture<Reply2ListBundle>
+//                reply = stub.listBundle(Request2ListBundle.newBuilder().setMerchantCode(merchantCode).build());
+//
+//        //这种实现相当于是blocking stub
+//        while (true)
+//            if (reply.isDone()) {
+//                return reply.get();
+//            }
     }
 
-    public ListenableFuture<Reply2ListBundle> listBundleAsnyc(String merchantCode) throws Exception {
+    public ListenableFuture<Reply2ListBundle> listBundleAsnyc(String merchantCode)
+            throws Exception {
         // 按照官方介绍，channel应该做成长连接，而不是每次使用时build一个，但官方没有提供连接池。
         final ManagedChannel channel =
                 ManagedChannelBuilder.forAddress("localhost", customResource.getGrpcPort())
                         .usePlaintext(true).build();
-        final GagaProviderGrpc.GagaProviderFutureStub stub = GagaProviderGrpc.newFutureStub(channel);
-        return stub.listBundle(Request2ListBundle.newBuilder().setMerchantCode(merchantCode).build());
+        final GagaProviderGrpc.GagaProviderFutureStub stub =
+                GagaProviderGrpc.newFutureStub(channel);
+        return stub
+                .listBundle(Request2ListBundle.newBuilder().setMerchantCode(merchantCode).build());
     }
 
 }
