@@ -2,6 +2,7 @@
 Demo for gRPC
 
 ## 项目结构
+
 ```
 Matrix
 ├── build.gradle
@@ -18,9 +19,11 @@ Matrix
 ```
 
 ## 使用protobuf生成对应java代码
+
 `$> gradle clean generateProto`
 
 ## 实现rpc接口
+
 ```
 @GRpcService
 public class SomeYourService extends SomeGrpc.SomeImplBase {
@@ -34,17 +37,74 @@ public class SomeYourService extends SomeGrpc.SomeImplBase {
 ```
 
 ## 实现rpc客户端
-   1.Future 模式
-```
- public Reply2ListBundle listBundle(String merchantCode) throws Exception {
-        final ManagedChannel channel =
-                ManagedChannelBuilder.forAddress(${YOUR_HOST}, ${YOUR_PORT}).usePlaintext(true).build();
-        final GagaProviderGrpc.GagaProviderFutureStub stub = GagaProviderGrpc.newFutureStub(channel); // Future model
-        ListenableFuture<Reply2ListBundle> reply = stub.listBundle(Request2ListBundle.newBuilder().setMerchantCode(merchantCode).build());
 
-        while (true)
-            if (reply.isDone()) {
-                return reply.get();
-            }
+1. Future 模式
+  1. client
+
+```java
+ public class Client {
+    
+     ... // some code
+    
+     public ListenableFuture<Reply2ListBundle> listBundleAsnyc(String merchantCode)
+                 throws Exception {
+             final ManagedChannel channel = ManagedChannelBuilder.forAddress(HOST, PORT).usePlaintext(true).build();
+             final GagaProviderGrpc.GagaProviderFutureStub stub = GagaProviderGrpc.newFutureStub(channel);
+             return stub.listBundle(Request2ListBundle.newBuilder().setMerchantCode(merchantCode).build());
+         }
+         
+     ... // some code
+ }
+```
+
+  2. Listener 方式
+
+```java
+    Client client = new Client();// init client
+    ListenableFuture<Reply2ListBundle> reply = client.listBundleAsnyc(merchantCode);
+    
+    reply.addListener(
+        ()->{
+            ... // some code will run after reply was done.
+        }
+        , executor);
+         
+    ... // some code will run in main thread.   
+```
+
+  3. Callback 方式
+
+```java
+    Client client = new Client();// init client
+    ListenableFuture<Reply2ListBundle> reply = client.listBundleAsnyc(merchantCode);
+    
+    Futures.addCallback(reply, new FutureCallback<Reply2ListBundle>() {
+        @Override public void onSuccess(@Nullable Reply2ListBundle result) {
+            ... // some code
+        }
+        @Override public void onFailure(@Nullable Reply2ListBundle result) {
+            ... // some code
+        }
+    });
+    
+    ... // some code will run in main thread.
+```
+
+2. Blocking 模式
+
+```java
+public class Client {
+    
+     ... // some code
+     
+    public Reply2ListBundle listBundle(String merchantCode) throws Exception {
+            final ManagedChannel channel = ManagedChannelBuilder.forAddress(HOST, PORT).usePlaintext(true).build();
+            final GagaProviderGrpc.GagaProviderBlockingStub stub = GagaProviderGrpc.newBlockingStub(channel);
+            Reply2ListBundle reply = stub.listBundle(Request2ListBundle.newBuilder().setMerchantCode(merchantCode).build());
+            return reply;
     }
+    
+     ... // some code
+     
+}
 ```
