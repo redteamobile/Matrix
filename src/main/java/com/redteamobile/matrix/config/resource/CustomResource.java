@@ -9,6 +9,7 @@ public class CustomResource {
     // 绑定到资源文件*.properties中的值
     private @Value("${matrix.config.custom.name}") String name;
     private @Value("${grpc.port}") int grpcPort;
+    private @Value("${grpc.host}") String grpcHost;
 
     public String getName() {
         return name;
@@ -24,6 +25,15 @@ public class CustomResource {
 
     public CustomResource setGrpcPort(int grpcPort) {
         this.grpcPort = grpcPort;
+        return this;
+    }
+
+    public String getGrpcHost() {
+        return grpcHost;
+    }
+
+    public CustomResource setGrpcHost(String grpcHost) {
+        this.grpcHost = grpcHost;
         return this;
     }
 }

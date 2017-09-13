@@ -50,6 +50,7 @@
     <logger name="org.springframework.boot" level="INFO"/>
     <logger name="springfox" level="WARN"/>
     <logger name="liquibase" level="INFO"/>
+    <!--<logger name="io.grpc" level="DEBUG"/>-->
     <logger name="sun.rmi" level="WARN"/>
     <logger name="sun.net.www.protocol.http.HttpURLConnection" level="WARN"/>
     <logger name="javax.activation" level="WARN"/>
